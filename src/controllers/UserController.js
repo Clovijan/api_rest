@@ -26,25 +26,18 @@ class UserController {
   async show(req, res) {
     try {
       const { id } = req.params;
-      const user = await User.findOne({
-        where: { id },
-        attributes: ['id', 'nome', 'email'],
-      });
-      return res.json(user);
+      const user = await User.findByPk(id);
+      const { nome, email } = user;
+      return res.json({ id, nome, email });
     } catch (e) {
+      console.log(e);
       return res.json(null);
     }
   }
 
   async update(req, res) {
     try {
-      const { id } = req.params;
-      if (!id) {
-        return res.status(400).json({
-          errros: ['ID não enviado!'],
-        });
-      }
-      const user = await User.findByPk(id);
+      const user = await User.findByPk(req.useId);
       if (!user) {
         return res.status(400).json({
           errors: [' Usuário não cadastrado!'],
@@ -63,21 +56,16 @@ class UserController {
   // Falta editar
   async delete(req, res) {
     try {
-      const { id } = req.params;
-      if (!id) {
-        return res.status(400).json({
-          errros: ['ID não enviado!'],
-        });
-      }
-      const user = await User.findByPk(id);
+      const user = await User.findByPk(req.useId);
       if (!user) {
         return res.status(400).json({
           errors: [' Usuário não cadastrado!'],
         });
       }
+      const { id, nome, email } = user;
       await user.destroy();
 
-      return res.json(user);
+      return res.json({ id, nome, email });
     } catch (e) {
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
